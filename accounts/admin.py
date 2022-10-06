@@ -11,12 +11,12 @@ class CustomAdminUser(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ("email", "name", "surname", "rating", "date_of_birth", "is_admin")
+    list_display = ("email", "name", "surname", "rating", "date_of_birth", "is_admin", "listed_offers_limit")
     list_filter = ("is_admin", "email")
     ordering = ["email"]
 
     fieldsets = (
-        (None, {"fields": ("email", "password")}),
+        ("Generic", {"fields": ("email", "password")}),
         ("Personal info", {"fields": ("date_of_birth",)}),
         ("Permissions", {"fields": ("is_admin", "is_superuser", "is_staff")}),
     )

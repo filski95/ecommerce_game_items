@@ -28,11 +28,10 @@ class CustomUserManager(BaseUserManager):
         birth and password.
         """
         user = self.create_user(email, password=password, date_of_birth=date_of_birth, name=name, surname=surname)
-        user.is_admin = True
-        user.is_superuser = True  # user with all permissions -> has perm = true?
 
+        user.is_superuser = True  # user with all permissions
         user.is_staff = True  # allows admin login
-
+        user.listed_offers_limit = 1000
         user.save(using=self._db)
         return user
 

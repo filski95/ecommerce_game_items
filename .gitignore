@@ -19,6 +19,8 @@ schema.y*
 # Backup files # 
 *.bak 
 2022-10*
+.vscode
+
 
 # If you are using PyCharm # 
 # User-specific stuff
