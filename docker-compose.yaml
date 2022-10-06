@@ -1,0 +1,51 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000" #container : host
+    command: python /app/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app # bind mount to allow constant code updates without having to recreated the image
+    env_file:
+      - ./env
+    depends_on:
+      - db
+      # - redis
+  db:
+    image: postgres:13.4-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./env
+    container_name: ecommerce_db
+    # celery:
+    #   build: .
+    #   container_name: celery-worker_ecommerce
+    #   restart: always
+    #   volumes:
+    #     - .:/app
+    #     # env_file:
+    #     # - fileName
+    #   depends_on:
+    #     - web
+    #     - redis
+    # celerybeat:
+    #   build: .
+    #   container_name: celerybeat_ecommerce
+    #   restart: always
+    #   command: celery -A core beat --loglevel=INFO
+    #   volumes:
+    #     - .:/app
+    #   # env_file:
+    #   #   - ./env/django.env
+    #   depends_on:
+    #     - web
+    #     - redis
+    #     - celery
+
+    # redis:
+    #   image: "redis:alpine"
+    #   container_name: redis_ecommerce
+
+volumes:
+  postgres_data:
