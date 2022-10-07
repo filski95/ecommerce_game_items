@@ -38,12 +38,24 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles",  # also needed by django debug toolbar
     # apps
     "accounts.apps.AccountsConfig",
     # 3rd
     "rest_framework",
+    "rest_framework.authtoken",
+    "dj_rest_auth",  # login
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "dj_rest_auth.registration",
+    #
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.twitter",
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -68,11 +80,13 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.request",
             ],
         },
     },
 ]
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 WSGI_APPLICATION = "core.wsgi.application"
 
 
@@ -138,6 +152,14 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": [None, "v1"],
 }
-
-
 AUTH_USER_MODEL = "accounts.CustomUserModel"
+
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+# * https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
+REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.CustomUserSerializer"}
