@@ -7,6 +7,7 @@ class CustomUserManager(BaseUserManager):
         """
         Creates and saves a User with the given email, date of
         birth and password.
+        -> s
         """
         if not email or not name or not surname:
             raise ValueError("Users must have an email address")
@@ -19,7 +20,13 @@ class CustomUserManager(BaseUserManager):
         )
 
         user.set_password(password)
-        user.save(using=self._db)
+        user.save(using=self._db)  # argument rather obsolete, used in multiple database environments
+
+        # todo test this
+        if not user.is_superuser:
+            # create profile automatically and assign it to a non admin user
+            p = CustomerProfile.objects.create(user=user)
+
         return user
 
     def create_superuser(self, email, name, surname, date_of_birth, password):
@@ -85,6 +92,14 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
 
 
 class CustomerProfile(models.Model):
+    """
+    customer profile which is linked with every non admin user.
+    -> creation in the model manager of CustomUserModel
+    """
+
+    class Meta:
+        verbose_name_plural = "Customer Profiles"
+
     user = models.OneToOneField(CustomUserModel, on_delete=models.CASCADE)
     total_revenue_generated = models.IntegerField(blank=True, default=0)
     items_sold = models.SmallIntegerField(blank=True, default=0)

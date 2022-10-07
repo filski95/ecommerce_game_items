@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import CustomUserModel
+from .models import CustomerProfile, CustomUserModel
 
 
 class CustomAdminUser(BaseUserAdmin):
@@ -33,3 +33,4 @@ class CustomAdminUser(BaseUserAdmin):
 
 
 admin.site.register(CustomUserModel, CustomAdminUser)
+admin.site.register(CustomerProfile)

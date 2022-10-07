@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    "django.contrib.staticfiles",  # also needed by django debug toolbar
     # apps
     "accounts.apps.AccountsConfig",
     # 3rd
@@ -162,4 +162,4 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 # * https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
-REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.MyCustomUserSerializer"}
+REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.CustomUserSerializer"}
