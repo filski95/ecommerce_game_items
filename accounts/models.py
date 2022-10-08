@@ -48,6 +48,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         verbose_name_plural = "Custom Users"
+        ordering = ["id"]
 
     email = models.EmailField(
         verbose_name="email address",
@@ -83,7 +84,7 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
         return f"{self.name} {self.surname}"
 
     def rate_user(self, other_user):
-        # todo method to rater another user
+        # todo method to rate another user
         pass
 
     def add_game(self):
@@ -100,6 +101,7 @@ class CustomerProfile(models.Model):
     class Meta:
         verbose_name_plural = "Customer Profiles"
 
+    # todo signal for creation?
     user = models.OneToOneField(CustomUserModel, on_delete=models.CASCADE)
     total_revenue_generated = models.IntegerField(blank=True, default=0)
     items_sold = models.SmallIntegerField(blank=True, default=0)
@@ -107,3 +109,6 @@ class CustomerProfile(models.Model):
     days_in_row = models.SmallIntegerField(
         blank=True, help_text="number of days user visited the site in a row", default=0
     )
+
+    def __str__(self) -> str:
+        return f"Profile:{self.id} User: {self.user}"

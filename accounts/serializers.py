@@ -22,7 +22,6 @@ class CustomUserSerializer(ModelSerializer):
         # to allow dj-rest-registration -> otherwise error with arguments
 
     def save(self, *args, **kwargs):
-
         return super().save(**kwargs)
 
     def validate(self, data):

@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.facebook",
     "allauth.socialaccount.providers.twitter",
+    # filtering
+    "django_filters",
+    # documentation:
+    "drf_spectacular",
 ]
 
 SITE_ID = 1
@@ -151,6 +155,11 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": [None, "v1"],
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],  # generic access to the site - more restrictive on respective views
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",  # Documentation
 }
 AUTH_USER_MODEL = "accounts.CustomUserModel"
 
@@ -161,5 +170,13 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_VERIFICATION = "optional"
-# * https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
+# https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
 REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.CustomUserSerializer"}
+
+# Documentation settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Ecommerce for gaming industry",
+    "DESCRIPTION": "An ecommerce platform allowing people to trade in-game and merchandise items related to specific titles",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}

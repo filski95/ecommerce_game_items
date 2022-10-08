@@ -7,7 +7,14 @@ from .forms import CustomUserChangeForm, CustomUserCreationForm
 from .models import CustomerProfile, CustomUserModel
 
 
+class CustomerProfileInline(admin.StackedInline):
+    """Customer profile's model fields visible on the CustomUser tab in admin"""
+
+    model = CustomerProfile
+
+
 class CustomAdminUser(BaseUserAdmin):
+    inlines = [CustomerProfileInline]
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
