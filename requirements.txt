@@ -23,6 +23,7 @@ django-allauth==0.50.0
 django-debug-toolbar==3.7.0
 django-filter==22.1
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.1
 drf-spectacular==0.24.2
 idna==3.4
 inflection==0.5.1

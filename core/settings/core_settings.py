@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
+
+from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # * added another parent as settings have been moved deeper
@@ -84,7 +87,6 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
-                "django.template.context_processors.request",
             ],
         },
     },
@@ -156,10 +158,14 @@ REST_FRAMEWORK = {
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": [None, "v1"],
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ],  # generic access to the site - more restrictive on respective views
+    # generic access to the site - more restrictive on respective views
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",  # Documentation
+    # simplejwt token auth, dev development with added session authentication
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+    ),
 }
 AUTH_USER_MODEL = "accounts.CustomUserModel"
 
@@ -169,9 +175,27 @@ ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# to allow the website to verify the user when the user opens the link received in the email
+# and subesquently redirect to a given URL // dj allauthfConfirmEmailView
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+LOGIN_URL = reverse_lazy("api_root")  # ultimately url from the actual website
+ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "0.0.0.0:8000/api/v1/"
+
 # https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
 REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.CustomUserSerializer"}
+# allow JWT authentication in dj-rest-auth
+# https://dj-rest-auth.readthedocs.io/en/latest/installation.html
+REST_AUTH_SERIALIZERS = {"LOGIN_SERIALIZER": "accounts.serializers.CustomLoginSerializer"}
+# * required to sync dj-rest-auth with simplejwt. Without this upon login django tokens are yielded and not refresh/access tokens
+REST_USE_JWT = True
+# * following documentation below settings are necessary to use refresh tokens
+# Set-Cookie: my-app-auth=xxxxxxxxxxxxx; expires=Sat, 28 Mar 2020 18:59:00 GMT; HttpOnly; Max-Age=300; Path=/
+# https://dj-rest-auth.readthedocs.io/en/latest/installation.html
+# refresh-tokens stored in cookies -< without these settings in postman after loggin in cookies would not include ref and acc tokens
+JWT_AUTH_COOKIE = "my-app-auth"
+JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"
+
 
 # Documentation settings
 SPECTACULAR_SETTINGS = {
@@ -179,4 +203,9 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "An ecommerce platform allowing people to trade in-game and merchandise items related to specific titles",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+SIMPLE_JWT = {
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(hours=1),
 }

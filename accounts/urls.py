@@ -7,6 +7,7 @@ app_name = "accounts"
 router = SimpleRouter()
 router.register("users", UsersListViewSet, basename="users")
 
+
 urlpatterns = []
 
 

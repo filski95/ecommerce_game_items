@@ -1,0 +1,15 @@
+dj-rest-auth uses by default below to verify email addresses of newly registered users
+
+re_path(
+        r"^dj-rest-auth/registration/account-confirm-email/(?P<key>[-:\w]+)/",
+            VerifyEmailView.as_view(),
+        name="account_confirm_email",
+
+
+This requires a front end / manual copy of a token/key from the url. To avoid that I implemented the dj-allauth solution
+with ConfirmEmailView and ACCOUNT_CONFIRM_EMAIL_ON_GET = True. Conseuqently clicking on the link in the email is enough to confirm.
+
+After this implementation emails were getting confirmed but the redirect did not work as the template on the browsable api was directing to
+a template that was non existent on the project. [templates/account/base.html]
+
+I created this directory/template and put the % url api_root % to fix the problem

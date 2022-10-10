@@ -1,8 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 
 from accounts.models import CustomerProfile, CustomUserModel
 
@@ -11,6 +9,7 @@ from .serializers import CustomUserSerializer, MainCustomUserSerializer
 
 
 class UsersListViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAdminUser]
     serializer_class = MainCustomUserSerializer
     # * djangoFilterBackend must be specified explicitly (despite global setting) as the other 2 would override it
     filter_backends = [filters.SearchFilter, DjangoFilterBackend, filters.OrderingFilter]
