@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 from .forms import CustomUserChangeForm, CustomUserCreationForm
-from .models import CustomerProfile, CustomUserModel
+from .models import CustomerProfile, CustomUserModel, Subscription
 
 
 class CustomerProfileInline(admin.StackedInline):
@@ -13,12 +13,27 @@ class CustomerProfileInline(admin.StackedInline):
     model = CustomerProfile
 
 
+class SubscriptionInline(admin.StackedInline):
+    """Subscription model fields visible on the CustomUser tab in admin"""
+
+    model = Subscription
+    readonly_fields = ("trial_used",)
+
+
 class CustomAdminUser(BaseUserAdmin):
-    inlines = [CustomerProfileInline]
+    inlines = [CustomerProfileInline, SubscriptionInline]
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ("email", "name", "surname", "rating", "date_of_birth", "is_admin", "listed_offers_limit")
+    list_display = (
+        "email",
+        "name",
+        "surname",
+        "rating",
+        "date_of_birth",
+        "is_admin",
+        "listed_offers_limit",
+    )
     list_filter = ("is_admin", "email")
     ordering = ["email"]
 
@@ -41,3 +56,4 @@ class CustomAdminUser(BaseUserAdmin):
 
 admin.site.register(CustomUserModel, CustomAdminUser)
 admin.site.register(CustomerProfile)
+admin.site.register(Subscription)

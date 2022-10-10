@@ -46,6 +46,7 @@ def api_root(request, format=None):
     name_links_dictionary = {
         "users": reverse("accounts:users-list", request=request),
         "obtain_token": reverse("token_obtain_pair", request=request),
+        "register": reverse("rest_register", request=request),
     }
 
     # complement root url dictionary with the dj-rest-auth endpoints
