@@ -50,7 +50,7 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     # * simplejwt tokens
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"), # dj-rest-auth provides it already
     path("api/token/verify/", TokenVerifyView.as_view(), name="token_verify"),
 ]
 
@@ -86,3 +86,6 @@ urlpatterns += [
     )
 ]
 urlpatterns += [path("dj-rest-auth/facebook/", FacebookLogin.as_view(), name="fb_login")]
+
+
+urlpatterns += [path("api-auth/", include("rest_framework.urls"))]

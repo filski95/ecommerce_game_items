@@ -1,5 +1,4 @@
 import re
-from multiprocessing.sharedctypes import Value
 
 from dj_rest_auth.serializers import LoginSerializer
 from django.contrib.auth import get_user_model
@@ -73,8 +72,10 @@ class CustomUserSerializer(ModelSerializer):
 
 class MainCustomUserSerializer(ModelSerializer):
     """
-    serializer used for list view which will be available to admin only users.
+    serializer used for a list view which will be available to admin only users.
     """
+
+    url = serializers.HyperlinkedIdentityField(view_name="users-detail")
 
     class Meta:
         model = CustomUserModel
@@ -95,7 +96,32 @@ class MainCustomUserSerializer(ModelSerializer):
             "groups",
             "user_permissions",
             "customerprofile",
+            "url",
         ]
 
         # depth set primarily to view attributes of customerprofile. 2 would repeat user which is not desired
         depth = 1
+
+    def get_field_names(self, declared_fields, info):
+        """
+        users can see most of their attributes.. Admin users see all
+        """
+        superuser = self.context.get("request").user.is_superuser
+
+        if not superuser:
+            fields = [
+                "id",
+                "last_login",
+                "email",
+                "date_of_birth",
+                "name",
+                "surname",
+                "rating",
+                "listed_offers_limit",
+                "joined_on",
+                "url",
+            ]
+        else:
+            fields = super().get_field_names(declared_fields, info)
+
+        return fields

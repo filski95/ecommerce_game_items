@@ -1,10 +1,11 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, viewsets
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from accounts.models import CustomerProfile, CustomUserModel
 
 from .filters import UserFilter
+from .permissions import UserOrIsAdmin
 from .serializers import CustomUserSerializer, MainCustomUserSerializer
 
 
@@ -35,3 +36,12 @@ class UsersListViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
         return users
+
+    def get_permissions(self):
+        permission_classes = []
+        if self.action == "list":
+            permission_classes = [IsAdminUser]
+        elif self.action == "retrieve":
+            permission_classes = [UserOrIsAdmin]
+
+        return [permission() for permission in permission_classes]

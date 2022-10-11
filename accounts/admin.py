@@ -18,7 +18,7 @@ class CustomAdminUser(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ("email", "name", "surname", "rating", "date_of_birth", "is_admin", "listed_offers_limit")
+    list_display = ("email", "name", "surname", "rating", "date_of_birth", "is_admin", "listed_offers_limit", "id")
     list_filter = ("is_admin", "email")
     ordering = ["email"]
 
