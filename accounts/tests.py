@@ -29,10 +29,15 @@ class UserTests(APITestCase):
         )
 
     def test_customerprofile_automatic_creation(self):
-        """customerprofile is created after user is saved -> + linked"""
+        """
+        customerprofile is created after user is saved -> + linked
+        same goes for subscription
+        """
         profile = self.testuser_1.customerprofile
+        subscription = self.testuser_1.subscription
 
         self.assertEqual(profile.id, 1)
+        self.assertEqual(subscription.id, 1)
 
     def test_JWT_users_list_view(self):
         """

@@ -26,6 +26,8 @@ class CustomUserManager(BaseUserManager):
         if not user.is_superuser:
             # create profile automatically and assign it to a non admin user
             p = CustomerProfile.objects.create(user=user)
+            # create subscription automatically and assign it to a non admin user
+            sub = Subscription.objects.create(user=user)
 
         return user
 
@@ -61,7 +63,6 @@ class CustomUserModel(AbstractBaseUser, PermissionsMixin):
     surname = models.CharField(max_length=20)
     # 10.00 will be max can be null at first -> given by another users
     rating = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    # TODO possibly extend to choices and link to subscription type that will be added to the model / or maybe on the subscription model?
     listed_offers_limit = models.SmallIntegerField(editable=False, default=5)
     joined_on = models.DateTimeField(auto_now_add=True, editable=False)
 
@@ -112,3 +113,22 @@ class CustomerProfile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile:{self.id} User: {self.user}"
+
+
+class Subscription(models.Model):
+    TRIAL = "T"
+    NORMAL = "N"
+    SUPER = "S"
+    PREMIUM = "P"
+    FREE = "X"
+
+    TYPE_CHOICES = [(TRIAL, "Trial"), (NORMAL, "Normal"), (SUPER, "Super"), (PREMIUM, "Premium"), (FREE, "Free")]
+
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=FREE, blank=True)
+    trial_used = models.BooleanField(default=False)
+    start_date = models.DateField(blank=True, null=True)
+    end_date = models.DateField(blank=True, null=True)
+
+    user = models.OneToOneField(
+        CustomUserModel, on_delete=models.CASCADE, related_name="subscription", blank=True, null=True
+    )

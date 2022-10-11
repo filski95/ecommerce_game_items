@@ -48,14 +48,14 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "dj_rest_auth",  # login
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "dj_rest_auth.registration",
+    "django.contrib.sites",  # dj-rest-auth registration
+    "allauth",  # dj-rest-auth registration
+    "allauth.account",  # dj-rest-auth registration
+    "dj_rest_auth.registration",  # dj-rest-auth registration
     #
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.facebook",
-    "allauth.socialaccount.providers.twitter",
+    "allauth.socialaccount",  # dj-rest-auth registration
+    "allauth.socialaccount.providers.facebook",  # dj-rest-auth registration
+    "allauth.socialaccount.providers.twitter",  # dj-rest-auth registration
     # filtering
     "django_filters",
     # documentation:
