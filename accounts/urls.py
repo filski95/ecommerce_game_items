@@ -5,10 +5,10 @@ from .views_api import UsersListViewSet
 
 app_name = "accounts"
 router = SimpleRouter()
-router.register("users", UsersListViewSet, basename="users")
+router.register("accounts/users", UsersListViewSet, basename="users")
 
 
 urlpatterns = []
 
 
-urlpatterns += router.urls
+# urlpatterns += router.urls

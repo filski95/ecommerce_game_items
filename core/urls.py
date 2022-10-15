@@ -14,30 +14,36 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-
+from accounts.urls import router as accounts_router
+from accounts.views_api import MyConfirmEmailView
 from allauth.account.views import ConfirmEmailView
-from dj_rest_auth.registration.views import VerifyEmailView
+from dj_rest_auth.registration.views import RegisterView, VerifyEmailView
 from django.contrib import admin
+from django.db import router
 from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from products.urls import router as products_router
+from rest_framework import routers
 from rest_framework.permissions import IsAdminUser
 from rest_framework.schemas import get_schema_view
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from .root_api_view import FacebookLogin, api_root
 
+app_name = "project"
+# * main default router consolidates routers from respective apps
+main_router = routers.DefaultRouter()
+main_router.registry.extend(products_router.registry)
+main_router.registry.extend(accounts_router.registry)
+
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/v1/", api_root, name="api_root"),
-    path("api/v1/accounts/", include("accounts.urls", namespace="v1")),
+    path("api/v1/", api_root, name="main_api_root"),
+    path("api/v1/apps/", include((main_router.urls, "project"), namespace="v1")),
+    # path("api/v1/apps/games/", include("products.urls", namespace="v1")),
     path(
         "dj-rest-auth/", include("dj_rest_auth.urls")
     ),  # provies all links from https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#requirements
-    path(
-        "dj-rest-auth/account-confirm-email/",
-        VerifyEmailView.as_view(),
-        name="account_email_verification_sent",
-    ),
     # * After this implementation emails were getting confirmed but the redirect did not work as the template on the browsable api was directing to
     # *a template that was non existent on the project. [templates/account/base.html]
     # *I created this directory/template and put the % url api_root % to fix the problem
@@ -46,6 +52,7 @@ urlpatterns = [
         ConfirmEmailView.as_view(),
         name="account_confirm_email",
     ),
+    # path("registration/account-confirm-email/(?P<key>[-:\w]+)/", RegisterView.as_view(), name="account_signup"),
     path("dj-rest-auth/registration/", include("dj_rest_auth.registration.urls")),  # registration dj rest auth,
     path("__debug__/", include("debug_toolbar.urls")),
     # * simplejwt tokens

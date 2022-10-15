@@ -5,31 +5,31 @@ from django.urls import reverse, reverse_lazy
 from .core_settings import *
 
 DEBUG = True
-ALLOWED_HOSTS = ["0.0.0.0"]
+ALLOWED_HOSTS = ["0.0.0.0", "localhost"]
 
 
 # * prints SQL queries instantly
-LOGGING = {
-    "version": 1,
-    "filters": {
-        "require_debug_true": {
-            "()": "django.utils.log.RequireDebugTrue",
-        }
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "filters": ["require_debug_true"],
-            "class": "logging.StreamHandler",
-        }
-    },
-    "loggers": {
-        "django.db.backends": {
-            "level": "DEBUG",
-            "handlers": ["console"],
-        }
-    },
-}
+# LOGGING = {
+#     "version": 1,
+#     "filters": {
+#         "require_debug_true": {
+#             "()": "django.utils.log.RequireDebugTrue",
+#         }
+#     },
+#     "handlers": {
+#         "console": {
+#             "level": "DEBUG",
+#             "filters": ["require_debug_true"],
+#             "class": "logging.StreamHandler",
+#         }
+#     },
+#     "loggers": {
+#         "django.db.backends": {
+#             "level": "DEBUG",
+#             "handlers": ["console"],
+#         }
+#     },
+# }
 
 
 # django debug toolbar
@@ -50,7 +50,7 @@ REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"] += (  # type: ignore
     "rest_framework.authentication.SessionAuthentication",
 )
 # * test environment without mandatory email verification after registration through dj-rest-auth
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 
 # redirect after newly registered user clicks on a link in the email
-LOGIN_URL = reverse_lazy("api_root")  # ultimately url from the actual website
+LOGIN_URL = reverse_lazy("main_api_root")  # ultimately url from the actual website

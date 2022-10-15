@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django.contrib import admin
 
 # Register your models here.
@@ -20,8 +21,13 @@ class SubscriptionInline(admin.StackedInline):
     readonly_fields = ("trial_used",)
 
 
+class EmailAddressInline(admin.StackedInline):
+
+    model = EmailAddress
+
+
 class CustomAdminUser(BaseUserAdmin):
-    inlines = [CustomerProfileInline, SubscriptionInline]
+    inlines = [CustomerProfileInline, SubscriptionInline, EmailAddressInline]
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 

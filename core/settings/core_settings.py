@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",  # also needed by django debug toolbar
     # apps
     "accounts.apps.AccountsConfig",
+    "products.apps.ProductsConfig",
     # 3rd
     "rest_framework",
     "rest_framework.authtoken",
@@ -179,8 +180,8 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 # to allow the website to verify the user when the user opens the link received in the email
 # and subesquently redirect to a given URL // dj allauthfConfirmEmailView
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-LOGIN_URL = reverse_lazy("api_root")  # ultimately url from the actual website
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "0.0.0.0:8000/api/v1/"
+LOGIN_URL = reverse_lazy("main_api_root")  # ultimately url from the actual website
+# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = "0.0.0.0:8000/api/v1/"
 
 # https://stackoverflow.com/questions/34038355/field-name-username-is-not-valid-for-model
 REST_AUTH_REGISTER_SERIALIZERS = {"REGISTER_SERIALIZER": "accounts.serializers.CustomUserSerializer"}

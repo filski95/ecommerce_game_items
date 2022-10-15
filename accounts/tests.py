@@ -8,6 +8,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from accounts.models import CustomerProfile, CustomUserModel
 
+api_ver = "v1"
+
 
 class UserTests(APITestCase):
     @classmethod
@@ -57,13 +59,14 @@ class UserTests(APITestCase):
 
         # use wrong token and get 401 status code
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer fake_token")
-        response_bad_req = self.client.get(reverse("accounts:users-list"))
+        # response_bad_req = self.client.get(reverse(f"{api_ver}:users-list"))
+        response_bad_req = self.client.get(reverse(f"{api_ver}:users-list"))
         self.assertEqual(response_bad_req.status_code, status.HTTP_401_UNAUTHORIZED)
 
         # use correct token and get 200 OK
         # * usage of access token-> in the header: Bearer ACCESS TOKEN
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
-        response = self.client.get(reverse("accounts:users-list"))
+        response = self.client.get(reverse(f"{api_ver}:users-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         # use refresh token and get 200 + new access token

@@ -1,3 +1,4 @@
+from allauth.account.views import ConfirmEmailView
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, viewsets
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
@@ -7,6 +8,16 @@ from accounts.models import CustomerProfile, CustomUserModel
 from .filters import UserFilter
 from .permissions import UserOrIsAdmin
 from .serializers import CustomUserSerializer, MainCustomUserSerializer
+
+
+class MyConfirmEmailView(ConfirmEmailView):
+    """
+    overriden allauth view to use own customized template.
+    template is ultimately not used, just
+
+    """
+
+    template_name: str = "accountsasdasd/base.html"
 
 
 class UsersListViewSet(viewsets.ReadOnlyModelViewSet):
