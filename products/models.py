@@ -119,7 +119,6 @@ class Item(BaseProduct):
 
 
 class ItemAttribute(models.Model):
-    # * this is meant to be created by admins in advance
 
     attribute_name = models.CharField(max_length=50)
     attribute_value = models.CharField(max_length=20, blank=False, null=True)

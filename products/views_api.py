@@ -81,6 +81,7 @@ class ItemViewSet(ModelViewSet):
     http_method_names: list[str] = ["put", "post", "get", "options"]
 
     def get_queryset(self):
+
         queryset = Item.objects.select_related("seller", "category").prefetch_related("attributes")
 
         return queryset
@@ -89,6 +90,6 @@ class ItemViewSet(ModelViewSet):
 class ItemAttributeViewSet(ViewSet):
     def list(self, request):
 
-        queryset = ItemAttribute.objects.all()
+        queryset = ItemAttribute.objects.select_related("object")
         serializer = ItemAttributeSerializer(queryset, many=True, context={"request": request})
         return Response(serializer.data)

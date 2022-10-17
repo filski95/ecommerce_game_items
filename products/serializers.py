@@ -161,19 +161,20 @@ class ItemAttributeSerializer(serializers.ModelSerializer):
     complete_attribute = serializers.CharField(read_only=True, required=False, allow_null=True)
     # id used to identify attribute objects in an update method
     id = serializers.IntegerField(required=False)
+    object = serializers.StringRelatedField()
 
     class Meta:
         model = ItemAttribute
-        fields = ["id", "complete_attribute", "attribute_name", "attribute_value", "attribute_description"]
+        fields = ["id", "complete_attribute", "attribute_name", "attribute_value", "attribute_description", "object"]
 
 
 class ItemSerializer(serializers.ModelSerializer):
 
     seller = serializers.StringRelatedField()
     category = serializers.StringRelatedField()
-    base_hierarchy = serializers.CharField(source="category.base_hierarchy")
+    base_hierarchy = serializers.CharField(source="category.base_hierarchy", required=False)
     url = serializers.HyperlinkedIdentityField(view_name="item-detail")
-    attributes = ItemAttributeSerializer(many=True)
+    attributes = ItemAttributeSerializer(many=True, allow_null=True, required=False)
     # attributes = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemAttribute.objects.all())
 
     class Meta:
@@ -189,6 +190,28 @@ class ItemSerializer(serializers.ModelSerializer):
             "ingame",
             "url",
         ]
+
+    def validate_attributes(self, value):
+        # required fields to check against
+        required_fields = set(["attribute_name", "attribute_value", "attribute_description"])
+        # if attributes is an empty list return validation error (attributes should be a list of attributes for respective nb of item attributes)
+        if len(value) == 0:
+            raise ValidationError(
+                "Attribute must contain 3 fields: attribute name, attribute value, attribute description"
+            )
+        # for each set of attribute fields check if list cotnains 3 records
+        for field_set in value:
+            if len(field_set) != 3:
+                raise ValidationError(
+                    "Check fields on the attributes! An attribute must contain 3 fields: attribute name, attribute value, attribute description"
+                )
+            # check if keys correspond to required_fields
+            if (field_set.keys() == required_fields) is False:
+                raise ValidationError(
+                    "Check fields on the attributes! An attribute must contain 3 fields: attribute name, attribute value, attribute description"
+                )
+
+        return value
 
     def to_representation(self, instance):
         """
@@ -206,11 +229,19 @@ class ItemSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        print(validated_data)
+        user = self.context.get("request").user
+        validated_data.update(seller=user)
 
-        raise ValueError("error")
+        attributes = validated_data.pop("attributes", None)
+        if attributes is not None or len(attributes) == 0:
 
-        return super().create(validated_data)
+            new_item = Item.objects.create(**validated_data)
+
+            print(attributes)
+            for attr_set in attributes:
+                ItemAttribute.objects.create(object=new_item, **attr_set)
+
+            return new_item
 
     def update(self, instance, validated_data):
         attr_list = validated_data.get("attributes")
