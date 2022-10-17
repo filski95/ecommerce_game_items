@@ -1,11 +1,10 @@
-from attr import validate
 from django.db.models import F
 from django.forms import CharField
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from rest_framework.serializers import HyperlinkedModelSerializer, ModelSerializer
 
-from products.models import Category, Game
+from products.models import Category, Game, Item, ItemAttribute
 
 from .fields import CategoryNameRelatedField
 
@@ -156,3 +155,85 @@ class GameSerializer(ModelSerializer):
             new_game.all_product_categories.set(new_game._get_all_subcategories(product_hierarchies))
 
         return new_game
+
+
+class ItemAttributeSerializer(serializers.ModelSerializer):
+    complete_attribute = serializers.CharField(read_only=True, required=False, allow_null=True)
+    # id used to identify attribute objects in an update method
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = ItemAttribute
+        fields = ["id", "complete_attribute", "attribute_name", "attribute_value", "attribute_description"]
+
+
+class ItemSerializer(serializers.ModelSerializer):
+
+    seller = serializers.StringRelatedField()
+    category = serializers.StringRelatedField()
+    base_hierarchy = serializers.CharField(source="category.base_hierarchy")
+    url = serializers.HyperlinkedIdentityField(view_name="item-detail")
+    attributes = ItemAttributeSerializer(many=True)
+    # attributes = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemAttribute.objects.all())
+
+    class Meta:
+        model = Item
+        fields = [
+            "name",
+            "description",
+            "seller",
+            "category",
+            "attributes",
+            "price",
+            "base_hierarchy",
+            "ingame",
+            "url",
+        ]
+
+    def to_representation(self, instance):
+        """
+        item attribute serializer exposes attributes ID to allow updates of nested ItemAttribute objects
+        -> fields must be writable, users should not be able to amend them tho -> removed from view
+        """
+
+        data = super().to_representation(instance)
+
+        attributes = data.get("attributes")
+        if attributes:
+            for att in attributes:
+                att.pop("id")
+
+        return data
+
+    def create(self, validated_data):
+        print(validated_data)
+
+        raise ValueError("error")
+
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        attr_list = validated_data.get("attributes")
+
+        new_atrs = []
+        for attribute in attr_list:
+            attr_id = attribute.get("id")
+            print(attribute)
+            if attr_id:
+                item_attribute = ItemAttribute.objects.get(id=attr_id)
+
+                item_attribute.attribute_name = attribute.get("attribute_name", item_attribute.attribute_name)
+                item_attribute.attribute_value = attribute.get("attribute_value", item_attribute.attribute_value)
+                item_attribute.attribute_description = attribute.get(
+                    "attribute_description", item_attribute.attribute_description
+                )
+                item_attribute.save()
+                new_atrs.append(item_attribute)
+            else:
+                attribute.pop("id", None)
+                new_attr = ItemAttribute.objects.create(object=instance, **attribute)
+                new_atrs.append(new_attr)
+
+            instance.attributes.set(new_atrs, clear=True)
+
+        return instance

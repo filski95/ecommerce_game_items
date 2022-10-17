@@ -1,11 +1,14 @@
+from django.db.models import Prefetch
+from rest_framework import generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet, ViewSet
 
-from products.serializers import CategorySerializer, GameSerializer
+from products.serializers import CategorySerializer, GameSerializer, ItemAttributeSerializer, ItemSerializer
 
-from .models import Category, Game
-from .permissions import IsAdminOrReadOnly
+from .models import Category, Game, Item, ItemAttribute
+from .permissions import IsAdminOrReadOnly, IsAdminOrSeller
 
 
 class GameViewSet(ModelViewSet):
@@ -54,8 +57,10 @@ class CategoryViewSet(ModelViewSet):
 
     def get_queryset(self):
 
+        created_by_parent_category = Category.objects.select_related("created_by", "parent_category")
+
         queryset = Category.objects.select_related("created_by", "parent_category").prefetch_related(
-            "child_categories__parent_category", "child_categories__created_by"
+            Prefetch("child_categories", queryset=created_by_parent_category)
         )
 
         return queryset
@@ -68,3 +73,22 @@ class CategoryViewSet(ModelViewSet):
             standard_context.update({"list_view": True})
 
         return standard_context
+
+
+class ItemViewSet(ModelViewSet):
+    serializer_class = ItemSerializer
+    permission_classes = [IsAdminOrSeller]
+    http_method_names: list[str] = ["put", "post", "get", "options"]
+
+    def get_queryset(self):
+        queryset = Item.objects.select_related("seller", "category").prefetch_related("attributes")
+
+        return queryset
+
+
+class ItemAttributeViewSet(ViewSet):
+    def list(self, request):
+
+        queryset = ItemAttribute.objects.all()
+        serializer = ItemAttributeSerializer(queryset, many=True, context={"request": request})
+        return Response(serializer.data)

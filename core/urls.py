@@ -40,7 +40,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/v1/", api_root, name="main_api_root"),
     path("api/v1/apps/", include((main_router.urls, "project"), namespace="v1")),
-    # path("api/v1/apps/games/", include("products.urls", namespace="v1")),
+    # path("api/v1/apps/", include("products.urls", namespace="v1")),
     path(
         "dj-rest-auth/", include("dj_rest_auth.urls")
     ),  # provies all links from https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#requirements

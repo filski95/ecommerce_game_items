@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from products.models import Category, Game
+from products.models import Category, Game, Item, ItemAttribute
 
 # Register your models here.
 
@@ -35,3 +35,5 @@ class GameAdmin(admin.ModelAdmin):
 
 admin.site.register(Game, GameAdmin)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(Item)
+admin.site.register(ItemAttribute)
