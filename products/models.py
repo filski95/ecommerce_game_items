@@ -25,6 +25,9 @@ class Game(models.Model):
     all_product_categories = models.ManyToManyField("Category", blank=True, related_name="games")
     slug = models.SlugField(max_length=50, blank=True, unique=True)
 
+    def __str__(self) -> str:
+        return self.game_name
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.game_name)
 
@@ -105,18 +108,30 @@ class BaseProduct(models.Model):
     class Meta:
         abstract = True
 
+    name = models.CharField(max_length=50, null=True)
+    description = models.TextField(null=True)
     ingame = models.BooleanField()
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     price = models.PositiveSmallIntegerField()
     seller = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
-
-
-class ItemAttribute(models.Model):
-    # * this is meant to be created by admins in advance
-
-    attribute = models.CharField(max_length=50)
-    attribute_description = models.TextField()
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=False)
 
 
 class Item(BaseProduct):
-    attributes = models.ManyToManyField(ItemAttribute, related_name="items")
+    def __str__(self) -> str:
+        return f"{self.name} [{self.id}]"
+
+
+class ItemAttribute(models.Model):
+
+    attribute_name = models.CharField(max_length=50)
+    attribute_value = models.CharField(max_length=20, blank=False, null=True)
+    attribute_description = models.TextField(blank=True, null=True)
+    object = models.ForeignKey(Item, related_name="attributes", blank=True, null=True, on_delete=models.CASCADE)
+
+    def __str__(self) -> str:
+        return f"{self.complete_attribute} [{self.id}]"
+
+    @property
+    def complete_attribute(self):
+        return self.attribute_name + ": " + self.attribute_value
