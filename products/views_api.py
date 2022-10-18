@@ -1,7 +1,7 @@
 from django.db.models import Prefetch
 from django_filters import rest_framework as dj_filters
-from rest_framework import filters, generics
-from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema
+from rest_framework import filters
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
@@ -106,7 +106,18 @@ class ItemViewSet(ModelViewSet):
 
 class ItemAttributeViewSet(ViewSet):
     def list(self, request):
-
         queryset = ItemAttribute.objects.select_related("object")
         serializer = ItemAttributeSerializer(queryset, many=True, context={"request": request})
         return Response(serializer.data)
+
+    def get_serializer_class(self):
+        """
+        for drf schema to eliminate "unable to guess serializer"
+        """
+        return ItemAttributeSerializer
+
+    def get_queryset(self):
+        """
+        for drf schema to eliminate "unable to guess serializer"
+        """
+        return ItemAttribute.objects.select_related("object")
