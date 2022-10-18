@@ -175,11 +175,12 @@ class ItemSerializer(serializers.ModelSerializer):
     base_hierarchy = serializers.CharField(source="category.base_hierarchy", required=False)
     url = serializers.HyperlinkedIdentityField(view_name="item-detail")
     attributes = ItemAttributeSerializer(many=True, allow_null=True, required=False)
-    # attributes = serializers.PrimaryKeyRelatedField(many=True, queryset=ItemAttribute.objects.all())
+    game = serializers.StringRelatedField()
 
     class Meta:
         model = Item
         fields = [
+            "game",
             "name",
             "description",
             "seller",

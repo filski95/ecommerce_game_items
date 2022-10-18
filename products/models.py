@@ -25,6 +25,9 @@ class Game(models.Model):
     all_product_categories = models.ManyToManyField("Category", blank=True, related_name="games")
     slug = models.SlugField(max_length=50, blank=True, unique=True)
 
+    def __str__(self) -> str:
+        return self.game_name
+
     def save(self, *args, **kwargs):
         self.slug = slugify(self.game_name)
 
@@ -111,6 +114,7 @@ class BaseProduct(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     price = models.PositiveSmallIntegerField()
     seller = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=True, blank=False)
 
 
 class Item(BaseProduct):
@@ -126,7 +130,7 @@ class ItemAttribute(models.Model):
     object = models.ForeignKey(Item, related_name="attributes", blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
-        return self.complete_attribute
+        return f"{self.complete_attribute} [{self.id}]"
 
     @property
     def complete_attribute(self):

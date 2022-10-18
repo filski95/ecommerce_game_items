@@ -9,6 +9,10 @@ class ReverseCategoryInLine(admin.TabularInline):
     model = Category
 
 
+class AttributeInline(admin.StackedInline):
+    model = ItemAttribute
+
+
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [ReverseCategoryInLine]
     list_display = (
@@ -33,7 +37,12 @@ class GameAdmin(admin.ModelAdmin):
     list_display = ["game_name", "genre", "release_date", "age_restriction", "slug"]
 
 
+class ItemAdmin(admin.ModelAdmin):
+    inlines = [AttributeInline]
+    list_display = ["name", "description", "ingame", "category", "price", "seller", "game"]
+
+
 admin.site.register(Game, GameAdmin)
 admin.site.register(Category, CategoryAdmin)
-admin.site.register(Item)
+admin.site.register(Item, ItemAdmin)
 admin.site.register(ItemAttribute)

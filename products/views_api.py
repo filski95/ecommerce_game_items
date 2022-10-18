@@ -1,10 +1,12 @@
 from django.db.models import Prefetch
-from rest_framework import generics
+from django_filters import rest_framework as dj_filters
+from rest_framework import filters, generics
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
+from products.filters import GameFilter, ItemFilter
 from products.serializers import CategorySerializer, GameSerializer, ItemAttributeSerializer, ItemSerializer
 
 from .models import Category, Game, Item, ItemAttribute
@@ -22,6 +24,10 @@ class GameViewSet(ModelViewSet):
     # * after lookup_url_kwarg is set to the lookup_field on the serializer
     # * api/v1/apps/ ^products/games/(?P<game_name>[^/.]+)\.(?P<format>[a-z0-9]+)/?$ [name='game-detail']
     permission_classes = [IsAdminOrReadOnly]
+
+    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter)
+    filterset_class = GameFilter
+    search_fields = ["game_name", "genre"]
 
     def perform_create(self, serializer):
         current_user = self.request.user
@@ -78,11 +84,14 @@ class CategoryViewSet(ModelViewSet):
 class ItemViewSet(ModelViewSet):
     serializer_class = ItemSerializer
     permission_classes = [IsAdminOrSeller]
-    http_method_names: list[str] = ["put", "post", "get", "options"]
+    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter)
+    http_method_names: list[str] = ["put", "post", "get", "options", "delete"]
+    filterset_class = ItemFilter
+    search_fields = ["game__game_name"]  # icontains by default
 
     def get_queryset(self):
 
-        queryset = Item.objects.select_related("seller", "category").prefetch_related("attributes")
+        queryset = Item.objects.select_related("seller", "category", "game").prefetch_related("attributes")
 
         return queryset
 
