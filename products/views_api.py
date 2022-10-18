@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
 
-from products.filters import GameFilter, ItemFilter
+from products.filters import CategoryFilter, GameFilter, ItemFilter
 from products.serializers import CategorySerializer, GameSerializer, ItemAttributeSerializer, ItemSerializer
 
 from .models import Category, Game, Item, ItemAttribute
@@ -25,9 +25,11 @@ class GameViewSet(ModelViewSet):
     # * api/v1/apps/ ^products/games/(?P<game_name>[^/.]+)\.(?P<format>[a-z0-9]+)/?$ [name='game-detail']
     permission_classes = [IsAdminOrReadOnly]
 
-    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     filterset_class = GameFilter
     search_fields = ["game_name", "genre"]
+    ordering_fields = ["game_name", "genre", "age_restriction"]
+    ordering = ["game_name"]
 
     def perform_create(self, serializer):
         current_user = self.request.user
@@ -53,6 +55,10 @@ class CategoryViewSet(ModelViewSet):
     # using category names in urls to retrieve objects instead of the default id
     lookup_field = "url_slug__iexact"
     lookup_url_kwarg = "url_slug"
+
+    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter)
+    filterset_class = CategoryFilter
+    search_fields = ["category_name"]
 
     def perform_create(self, serializer):
         current_user = self.request.user
@@ -84,10 +90,12 @@ class CategoryViewSet(ModelViewSet):
 class ItemViewSet(ModelViewSet):
     serializer_class = ItemSerializer
     permission_classes = [IsAdminOrSeller]
-    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (dj_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter)
     http_method_names: list[str] = ["put", "post", "get", "options", "delete"]
     filterset_class = ItemFilter
     search_fields = ["game__game_name"]  # icontains by default
+    ordering_fields = ["category", "seller", "game"]
+    ordering = ["Category"]
 
     def get_queryset(self):
 

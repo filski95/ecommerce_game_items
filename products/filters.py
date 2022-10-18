@@ -46,6 +46,16 @@ class ItemFilter(django_filters.FilterSet):
 
 
 class GameFilter(django_filters.FilterSet):
+    age_restriction = dj_filters.NumberFilter()
+    age_restriction__lte = dj_filters.NumberFilter(field_name="age_restriction", lookup_expr="lte")
+    age_restriction__gte = dj_filters.NumberFilter(field_name="age_restriction", lookup_expr="gte")
+
     class Meta:
         model = Game
         fields = "__all__"
+
+
+class CategoryFilter(django_filters.FilterSet):
+    class Meta:
+        model = Category
+        exclude = ["base_hierarchy", "url_slug"]
